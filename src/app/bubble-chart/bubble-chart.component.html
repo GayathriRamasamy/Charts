@@ -1,2 +1,10 @@
-<svg width="1300" height="500" font-family="sans-serif" font-size="10" text-anchor="middle"></svg>
-<button (click)="onClick()">Split</button>
+<!-- <svg width="1300" height="800" font-family="sans-serif" font-size="10" text-anchor="middle"></svg>
+<button (click)="onClick($event)">Split</button>
+<button (click)="normalChart()">Normal</button> -->
+
+<svg width="1300" height="800"  class="bubbles">
+  <g *ngFor="let d of values" [attr.transform]="'translate('+d.x+','+d.y+')'" 
+      (click)="onBubbleSelected(d)">
+      <circle [attr.r]="d.r" [attr.fill]="getColor(d)"></circle>
+  </g>
+</svg>   

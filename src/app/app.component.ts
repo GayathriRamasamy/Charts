@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Hospital';
+  isSpecial = true;
+  countries: any = ['India', 'China', 'USA'];
+  country;
+  onClick() {
+    this.isSpecial = !this.isSpecial;
+  }
 }

@@ -11,31 +11,10 @@ export class BubbleChartComponent implements OnInit {
       id: 1, name: 'Medical Incident', value: 1068, group: 'A'
     },
     {
-      id: 2, name: 'Alarms', value: 9702, group: 'B'
+      id: 17, name: 'Medical 4', value: 600, group: 'A'
     },
     {
       id: 3, name: 'Fire', value: 723, group: 'A'
-    },
-    {
-      id: 4, name: 'Vehicle - Related', value: 438, group: 'B'
-    },
-    {
-      id: 5, name: 'Other', value: 379, group: 'C'
-    },
-    {
-      id: 6, name: 'Citizen Assist / Service Call', value: 271, group: 'A'
-    },
-    {
-      id: 7, name: 'Environmental Hazard', value: 204, group: 'B'
-    },
-    {
-      id: 8, name: 'Rescue', value: 91, group: 'C'
-    },
-    {
-      id: 9, name: 'Rescue12', value: 700, group: 'C'
-    },
-    {
-      id: 10, name: 'Assist Policeq', value: 34, group: 'B'
     },
     {
       id: 11, name: 'Assist Police', value: 2, group: 'A'
@@ -44,44 +23,103 @@ export class BubbleChartComponent implements OnInit {
       id: 12, name: 'Sample 1', value: 733, group: 'A'
     },
     {
-      id: 13, name: 'Medical Group B', value: 650, group: 'B'
+      id: 6, name: 'Citizen Assist / Service Call', value: 271, group: 'A'
     },
     {
-      id: 14, name: 'Medical Group C', value: 823, group: 'C'
-    },
-    {
-      id: 15, name: 'Medical 1', value: 128, group: 'A'
-    },
-    {
-      id: 16, name: 'Medical 2', value: 254, group: 'C'
-    },
-    {
-      id: 17, name: 'Medical 4', value: 600, group: 'A'
-    },
-    {
-      id: 18, name: 'Medical 5', value: 2900, group: 'B'
+      id: 22, name: 'Medical 9', value: 1234, group: 'A'
     },
     {
       id: 19, name: 'Medical 6', value: 5634, group: 'A'
     },
     {
+      id: 15, name: 'Medical 1', value: 128, group: 'A'
+    },
+    {
+      id: 2, name: 'Alarms', value: 9702, group: 'B'
+    },
+    {
+      id: 4, name: 'Vehicle - Related', value: 438, group: 'B'
+    },
+    {
+      id: 13, name: 'Medical Group B', value: 650, group: 'B'
+    },
+    {
+      id: 7, name: 'Environmental Hazard', value: 204, group: 'B'
+    },
+    {
+      id: 10, name: 'Assist Policeq', value: 34, group: 'B'
+    },
+    {
+      id: 18, name: 'Medical 5', value: 2900, group: 'B'
+    },
+
+    {
       id: 20, name: 'Medical 7', value: 1068, group: 'B'
     },
     {
-      id: 21, name: 'Medical 8', value: 2312, group: 'C'
+      id: 5, name: 'Other', value: 379, group: 'C'
     },
     {
-      id: 22, name: 'Medical 9', value: 1234, group: 'A'
-    }
-  ];
-  constructor() { }
+      id: 8, name: 'Rescue', value: 91, group: 'C'
+    },
+    {
+      id: 9, name: 'Rescue12', value: 700, group: 'C'
+    },
+    {
+      id: 14, name: 'Medical Group C', value: 823, group: 'C'
+    },
 
+    {
+      id: 16, name: 'Medical 2', value: 254, group: 'C'
+    },
+    {
+      id: 21, name: 'Medical 8', value: 2312, group: 'C'
+    }
+
+  ];
+  pack = d3.pack()
+    .size([400, 400])
+    .padding(1.3);
+  root = d3.hierarchy({ children: this.data })
+    .sum(function (d) {
+      return d.value;
+    });
+
+  values = this.pack(this.root).leaves();
+
+
+  constructor() {
+    this.values = this.values.sort((a, b) => {
+      return a.value - b.value;
+    });
+  }
   ngOnInit() {
+    console.log(this.pack(this.root).leaves())
     let svg = null;
     svg = d3.select('svg');
+    // this.drawChart(false, svg);
+  }
+
+  onBubbleSelected(d) {
+    console.log(d)
+  }
+  getColor(d) {
+    if (d && d.data.group === 'A') {
+      return '#1976d2';
+    } else if (d.data.group === 'B') {
+      return '#1cd219';
+    } else {
+      return '#d27f19';
+    }
+  }
+  normalChart() {
+    let svg;
+    svg = d3.select('svg');
+    svg.selectAll('*').remove();
     this.drawChart(false, svg);
   }
-  onClick() {
+  onClick(e) {
+    console.log(e)
     let svg;
     svg = d3.select('svg');
     svg.selectAll('*').remove();
@@ -98,7 +136,7 @@ export class BubbleChartComponent implements OnInit {
       B: { x: width / 2, y: height / 2 },
       C: { x: 2 * width / 3, y: height / 2 }
     };
-    const nodes = [];
+    let nodes = [];
     const max_amount = d3.max(this.data, function (d) { return parseInt(d.value, 10); });
     const radius_scale = d3.scalePow().exponent(0.5).domain([0, max_amount]).range([2, 85]);
     this.data.forEach(function (d) {
@@ -153,8 +191,19 @@ export class BubbleChartComponent implements OnInit {
     // }
     // const root = d3.hierarchy({ children: this.data })
     //   .sum(function(d) { return d.value; });
+    //     var pack = d3.pack()
+    //       .size([width / 2, height / 2])
+    //       .padding(10)(
+    //         d3.hierarchy(nodes).sum(hierarchyData => {
+    //             return hierarchyData[`value`];
+    //         })
+    //       );
+    // console.log(pack)
+    // nodes = d3.hierarchy(nodes)
+    // .sum(function (d) { return d.value; });
     const node = svg.selectAll('circle')
       .data(nodes, function (d) { return d.id; })
+      // .data(pack.descendants())
       // .data(pack(root).leaves())
       .enter();
     const circles = node.append('circle')
@@ -205,22 +254,18 @@ export class BubbleChartComponent implements OnInit {
         .force(
           'collision',
           d3.forceCollide().radius(function (data) {
-            return +data.radius + 1;
+            return +data.radius;
           }))
-        .force('x', forceX)
-        .force('y', forceY)
-        .force('charge', d3.forceManyBody().strength(-0.00001));
+        .force('charge', d3.forceManyBody().strength(100).distanceMax(0).distanceMin(0));
     } else {
       simulation = d3.forceSimulation(nodes)
         .force('center', d3.forceCenter(width / 2, height / 2))
         .force(
           'collision',
           d3.forceCollide().radius(function (data) {
-            return +data.radius + 1;
-          }))
-        .force('x', forceX)
-        .force('y', forceY)
-        .force('charge', d3.forceManyBody().strength(-0.00001));
+            return +data.radius;
+          }).strength(1))
+        .force('charge', d3.forceManyBody().strength(100).distanceMax(0).distanceMin(0));
     }
     simulation.nodes(nodes);
 
@@ -237,10 +282,116 @@ export class BubbleChartComponent implements OnInit {
         d.y = d.y + (target.y - d.y) * (damper + 0.02) * alpha * 2.1;
       };
     }
+    function totalSort(alpha) {
+      var that = this;
+      return function (d) {
+        this.boundingRadius = radiusScale(this.totalValue);
+        this.centerX = this.width / 2;
+        this.centerY = 300;
+        var targetY = this.centerY;
+        var targetX = this.width / 2;
+
+        if (d.isNegative) {
+          if (d.changeCategory > 0) {
+            d.x = -200
+          } else {
+            d.x = 1100
+          }
+        }
+
+        // if (d.positions.total) {
+        //   targetX = d.positions.total.x
+        //   targetY = d.positions.total.y
+        // };
+
+
+
+        // 
+        d.y = d.y + (targetY - d.y) * (0.1 + 0.02) * alpha
+        d.x = d.x + (targetX - d.x) * (0.1 + 0.02) * alpha
+
+      };
+    }
+
+    function gravity(k) {
+      return function (d) {
+        if (typeof (d.tx) !== "undefined") {
+          d.x = d.x + (d.tx - d.x) * k;
+          d.y = d.y + (d.ty - d.y) * k;
+        }
+      };
+    }
+
+    function collide(k) {
+      var q = d3.quadtree(nodes);
+      return function (node) {
+        var nr = node.r,
+          nx1 = node.x - nr,
+          nx2 = node.x + nr,
+          ny1 = node.y - nr,
+          ny2 = node.y + nr;
+        q.visit(function (quad, x1, y1, x2, y2) {
+          if (quad.point && (quad.point !== node)) {
+            var x = node.x - quad.point.x,
+              y = node.y - quad.point.y,
+              l = x * x + y * y,
+              r = nr + quad.point.r;
+
+            if (l < r * r) {
+              l = ((l = Math.sqrt(l)) - r) / l * k;
+              node.x -= x *= l;
+              node.y -= y *= l;
+              //bind(node)
+              quad.point.x += x;
+              quad.point.y += y;
+              //bind(quad.point)
+              //if (node.x-node.r<200) {node.x=node.r+200+x;}
+            }
+          }
+          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+        });
+      };
+    }
+    function radiusScale(n) {
+      let rScale = d3.scalePow().exponent(0.5).domain([0, 1000000000]).range([1, 90])
+      return rScale(Math.abs(n));
+    };
+    function buoyancy(alpha) {
+      var that = this;
+      return function (d) {
+        this.boundingRadius = radiusScale(this.totalValue);
+        this.centerX = this.width / 2;
+        this.centerY = 300;
+        // d.y -= 1000 * alpha * alpha * alpha * d.changeCategory
+
+        // if (d.changeCategory >= 0) {
+        //   d.y -= 1000 * alpha * alpha * alpha
+        // } else {
+        //   d.y += 1000 * alpha * alpha * alpha
+        // }
+        // centerX: null,
+        // centerY: null,
+        // scatterPlotY: null,
+
+        // //d3 settings
+        // defaultGravity: 0.1,
+
+        var targetY = this.centerY * this.boundingRadius
+        d.y = d.y + (targetY - d.y) * (0.1) * alpha * alpha * alpha * 100
+
+
+
+      };
+    }
+
+
+
     simulation.on('tick', function () {
       if (id) {
         circles
-          .each(move_towards_group(this.alpha()))
+          .each(totalSort(this.alpha()))
+          .each(buoyancy(this.alpha()))
+          // .each(move_towards_group(this.alpha()))
           .attr('cx', function (d) {
             return d.x;
           })
@@ -248,6 +399,8 @@ export class BubbleChartComponent implements OnInit {
       } else {
         circles
           .each(move_towards_center(this.alpha()))
+          // .each(gravity(this.alpha() * 0.5))
+          // .each(collide(0.1))
           .attr('cx', function (d) {
             return d.x;
           })
